@@ -1,0 +1,31 @@
+apiVersion :v1
+kind :Pod
+metadata:
+  name:  Pod-Practice
+spec:
+  volumes:
+    - name: nfs-volume
+      nfs:
+        server: 192.168.49.1
+        path:  /mnt/shared
+    -  name: emptyDir-volume
+       emptyDir: {}
+
+  containers:
+    -  name: nginx-container
+      img: nginx:alpine
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "64Mi"
+        limits:
+          cpu: "500m"
+          memory: "128Mi"
+    volumeMount:
+      -  name: nfs-volume
+        mountPaht: /mnt/nfs
+      -  name: emptyDir-volume
+        mountPaht: /usr/share/nginx/html
+    ports:
+      -  containerPort: 80
+      

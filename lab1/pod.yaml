@@ -1,19 +1,19 @@
-apiVersion :v1
-kind :Pod
+apiVersion: v1
+kind: Pod
 metadata:
-  name:  Pod-Practice
+  name: pod-practice
 spec:
   volumes:
     - name: nfs-volume
       nfs:
         server: 192.168.49.1
-        path:  /mnt/shared
-    -  name: emptyDir-volume
-       emptyDir: {}
+        path: /mnt/shared
+    - name: emptydir-volume
+      emptyDir: {}
 
   containers:
-    -  name: nginx-container
-      img: nginx:alpine
+    - name: nginx-container
+      image: nginx:alpine
       resources:
         requests:
           cpu: "250m"
@@ -21,11 +21,30 @@ spec:
         limits:
           cpu: "500m"
           memory: "128Mi"
-    volumeMount:
-      -  name: nfs-volume
-        mountPaht: /mnt/nfs
-      -  name: emptyDir-volume
-        mountPaht: /usr/share/nginx/html
-    ports:
-      -  containerPort: 80
-      
+      volumeMounts:
+        - name: nfs-volume
+          mountPath: /mnt/nfs
+        - name: emptydir-volume
+          mountPath: /usr/share/nginx/html
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        httpGet:
+          port: 80
+          path: /
+        initialDelaySeconds: 10
+        periodSeconds: 10
+
+    - name: siedcar-container
+      image: busybox
+      command: ["bin/sh", "-c", "while true; do echo $(date) side car logging; sleep 5 ; done"]
+      resources:
+        requests:
+          memory: "16Mi"
+          cpu: "110m"
+        limits:
+          memory: "64Mi"
+          cpu: "250m"
+      volumeMounts:
+        - name: emptydir-volume        
+          mountPath: /mnt/shared

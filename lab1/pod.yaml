@@ -6,7 +6,7 @@ spec:
   volumes:
     - name: nfs-volume
       nfs:
-        server: 192.168.49.1
+        server: 192.168.100.6
         path: /mnt/shared
     - name: emptydir-volume
       emptyDir: {}
@@ -24,8 +24,8 @@ spec:
       volumeMounts:
         - name: nfs-volume
           mountPath: /mnt/nfs
-        - name: emptydir-volume
-          mountPath: /usr/share/nginx/html
+        - name:  emptydir-volume
+          mountPath:  /usr/share/nginx/html
       ports:
         - containerPort: 80
       livenessProbe:
@@ -37,7 +37,8 @@ spec:
 
     - name: siedcar-container
       image: busybox
-      command: ["bin/sh", "-c", "while true; do echo $(date) side car logging; sleep 5 ; done"]
+     
+      command: ["/bin/sh", "-c", "while true; do echo '<h1>Hello from sidecar</h1>' > /mnt/shared/index.html; sleep 10; done"]
       resources:
         requests:
           memory: "16Mi"
@@ -46,5 +47,5 @@ spec:
           memory: "64Mi"
           cpu: "250m"
       volumeMounts:
-        - name: emptydir-volume        
+        - name: emptydir-volume     
           mountPath: /mnt/shared
